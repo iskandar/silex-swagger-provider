@@ -64,7 +64,9 @@ class SwaggerServiceProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         if (isset($options["swagger.basePath"])) {
-            $resourceList["basePath"] = $options["swagger.basePath"];
+            // Append the $apiDocPath for the 'basePath' value in our Resource List request.
+            // This is a DIFFERENT 'basePath' from the actual API Resource URLs.
+            $resourceList["basePath"] = rtrim($options["swagger.basePath"], ' /') . $apiDocPath;
         }
 
         // Ensure that swagger.basePath, .apiVersion and .swaggerVersion options are respected.

@@ -76,12 +76,17 @@ class SwaggerServiceProvider implements ServiceProviderInterface
         $options = array(
             "output" => "json",
             "json_pretty_print" => $app["swagger.prettyPrint"],
-            'basePath' => $app["swagger.basePath"],
             "prefix" => $app["swagger.resourcePrefix"],
             "suffix" => $app["swagger.resourceSuffix"],
             "apiVersion" => $app["swagger.apiVersion"],
             "swaggerVersion" => $app["swagger.swaggerVersion"],
         );
+
+        if (isset($app["swagger.basePath"]) && $app["swagger.basePath"]) {
+            // If we have an explicit `basePath` value, we need to construct a special URL for our
+            // resource list - this URL *must* include the API doc path part.
+            $options['basePath'] = rtrim($app["swagger.basePath"], ' /') . $app["swagger.apiDocPath"];
+        }
         $json = $app["swagger"]->getResourceList($options);
 
         $response = Response::create($json, 200, array("Content-Type" => "application/json"));
@@ -114,6 +119,7 @@ class SwaggerServiceProvider implements ServiceProviderInterface
         $options = array(
             "output" => "json",
             "json_pretty_print" => $app["swagger.prettyPrint"],
+            // This `basePath` value is for API resources and should NOT have any API doc path part.
             "defaultBasePath" => $app["swagger.basePath"],
             "defaultApiVersion" => $app["swagger.apiVersion"],
             "defaultSwaggerVersion" => $app["swagger.swaggerVersion"],
